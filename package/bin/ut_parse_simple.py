@@ -15,7 +15,7 @@ need to load the TLD lists.
 ########
 logger = ut_log.setup_logger()
 
-header  = ['url', 
+header  = ['url',
 	'ut_scheme', 'ut_netloc', 'ut_path', 'ut_params', 'ut_query', 'ut_fragment']
 
 csv_in  = csv.DictReader(sys.stdin) # automatically use the first line as header

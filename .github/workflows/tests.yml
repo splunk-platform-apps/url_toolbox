@@ -1,0 +1,86 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unittest:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Run unit tests
+        env:
+          SPLUNK_HOME: .
+        run: python -m unittest discover tests
+
+  splunk-test:
+    name: Lookups on Splunk ${{ matrix.version }}
+    runs-on: ubuntu-latest
+    needs: unittest
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 10.0.1 # renovate: datasource=docker depName=splunk/splunk
+          - 9.3.0  # renovate: datasource=docker depName=splunk/splunk
+    env:
+      SPLUNK_HOST: https://localhost:8089
+      SPLUNK_USER: admin
+      SPLUNK_PASSWORD: password  # pragma: allowlist secret
+    services:
+      splunk:
+        image: splunk/splunk:${{ matrix.version }}
+        env:
+          SPLUNK_START_ARGS: --answer-yes --no-prompt --accept-license
+          SPLUNK_GENERAL_TERMS: --accept-sgt-current-at-splunk-com
+          SPLUNK_PASSWORD: password  # pragma: allowlist secret
+        options: >-
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+          --health-cmd "curl -sk https://localhost:8089/services/server/info -u admin:password -o /dev/null -w '%{http_code}' | grep -q 200"
+          --health-start-period 30s
+        ports:
+          - 8000:8000
+          - 8089:8089
+    steps:
+      - uses: actions/checkout@v7
+      - name: Copy the app to the Splunk container
+        run: docker cp package ${{ job.services.splunk.id }}:/opt/splunk/etc/apps/utbox
+      - name: Restart Splunk and wait for it to be up
+        run: |
+          curl -sk -u "${SPLUNK_USER}:${SPLUNK_PASSWORD}" "${SPLUNK_HOST}/services/server/control/restart" -X POST
+          sleep 30
+          for i in {1..60}; do
+            code=$(curl -sk -o /dev/null -w "%{http_code}" -u "${SPLUNK_USER}:${SPLUNK_PASSWORD}" "${SPLUNK_HOST}/services/server/info")
+            if [ "${code}" -eq 200 ]; then
+              echo "Splunk is up (attempt ${i})"
+              exit 0
+            fi
+            echo "Attempt ${i}/60: HTTP ${code}, waiting 5s"
+            sleep 5
+          done
+          echo "Splunk did not become ready"
+          exit 1
+      - name: Check the app is installed and enabled
+        run: |
+          curl -sk -u "${SPLUNK_USER}:${SPLUNK_PASSWORD}" "${SPLUNK_HOST}/services/apps/local/utbox?output_mode=json" \
+            | jq -e '.entry[0].content | (.disabled | not)'
+      - name: Run a search for each lookup
+        run: ./tests/splunk_smoke.sh

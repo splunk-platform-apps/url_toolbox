@@ -2,13 +2,14 @@ version: "3.6"
 
 services:
   splunk:
-    image: splunk/splunk:9.0.1
+    image: splunk/splunk:10.0.1
     container_name: utbox_workbench
     environment:
-      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_START_ARGS=--answer-yes --no-prompt --accept-license
+      - SPLUNK_GENERAL_TERMS=--accept-sgt-current-at-splunk-com
       - SPLUNK_PASSWORD=passw0rd
     ports:
       - 8000:8000
       - 8089:8089
     volumes:
-      - './utbox:/opt/splunk/etc/apps/utbox'
+      - './package:/opt/splunk/etc/apps/utbox'

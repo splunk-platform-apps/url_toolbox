@@ -7,7 +7,7 @@ log_path = Path(os.environ["SPLUNK_HOME"] + "/var/log/splunk")
 log_path.mkdir(parents=True, exist_ok=True)
 (log_path / Path("utbox.log")).write_text("")
 
-path_to_add = os.path.abspath(os.path.join(__file__, '..','..','utbox', 'bin'))
+path_to_add = os.path.abspath(os.path.join(__file__, '..','..','package', 'bin'))
 sys.path.append(path_to_add)
 
 import ut_parse_lib

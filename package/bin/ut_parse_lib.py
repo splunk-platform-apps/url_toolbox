@@ -45,7 +45,7 @@ def _loadIANAList(filename="suffix_list_iana.dat"):
         line = line.strip().lower()
         TLD['regulars'].append(line)  # com
         line = f.readline()
-    
+
     f.close()
 
     return TLD
@@ -57,7 +57,7 @@ def _loadMozillaList():
 
 	Ex: 'com' for '.com' or xn-<value>
 	Ex: http://xn--3et6hy9whxi095c.xn--fiqz9s/
-	
+
 	*.ck
 	!www.ck
 	"""
@@ -129,7 +129,7 @@ def loadTLDFile(tldlist="iana"):
 
 def findTLD(netloc, TLDList):
     """
-	Require a TLDList initialized by readTLDFile(). 
+	Require a TLDList initialized by readTLDFile().
 	The netloc args _must_ be lower-ed before entering this function.
 
 	COUAC  => None

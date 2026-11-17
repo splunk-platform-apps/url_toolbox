@@ -37,16 +37,16 @@ PRESETS = {
  '@vowels_up@'   : list(set('AEIOUY')),
  '@vowels_all@'  : list(set('aeiouyAEIOUY')),
 
- '@consonants@'    : list(set_az - set('aeiouy')),   
- '@consonants_up@' : list(set_az - set('AEIOUY')),   
- '@consonants_all@': list(set_az - set('aeiouyAEIOUY')),   
+ '@consonants@'    : list(set_az - set('aeiouy')),
+ '@consonants_up@' : list(set_az - set('AEIOUY')),
+ '@consonants_all@': list(set_az - set('aeiouyAEIOUY')),
 }
 
 
 def countset(word, wordset):
 	# @word@  is a special set which means that only the letters composing the submitted word are counted.
 
-	if wordset == "@word@" : 
+	if wordset == "@word@" :
 		s = list(set(word))
 	else:
 		try:
@@ -57,7 +57,7 @@ def countset(word, wordset):
 	counts = {'sum':0}
 	for c in s:
 		x = word.count(c)
-		counts[ '%X' % ord(c) ] = x 
+		counts[ '%X' % ord(c) ] = x
 		counts[ 'sum' ] += x
 
 	return counts
