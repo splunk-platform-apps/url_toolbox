@@ -43,8 +43,8 @@ The app provides one macro for each bundled lookup. The arguments are the fields
 | `ut_parse_simple(url)` | Splits a URL into `ut_scheme`, `ut_netloc`, `ut_path`, `ut_params`, `ut_query`, and `ut_fragment`. |
 | `ut_parse(url, list)` | Parses a URL into its parts and also returns the domain, subdomain, and TLD. It uses the suffix lists. It is a shortcut for `ut_parse_extended(url, list)`. |
 | `ut_shannon(word)` | Returns `ut_shannon`, the Shannon entropy of the value. |
-| `ut_countset(word, set)` | Returns `ut_countset`, the total and per-character counts of the characters in `set`. The set can be a preset such as `@digits@`, `@alpha@`, or `@hexa@`, `@word@` for the letters of the value itself, or a list of characters. |
-| `ut_suites(word, set)` | Returns `ut_suites`, the length of the longest run of consecutive characters for each preset in `set`, such as `@digits@,@alpha@`. |
+| `ut_countset(word, set)` | Returns `ut_countset`, the total and per-character counts of the characters in `set`. |
+| `ut_suites(word, set)` | Returns `ut_max_suite_<preset>`, the length of the longest run of consecutive characters for each preset in `set`. |
 | `ut_meaning(word)` | Returns `ut_meaning_ratio`, the ratio between the length of the known words found in the value and the length of the value. |
 | `ut_bayesian(word)` | Returns `ut_bayesian`, a naive Bayesian score of the probability that a domain is malicious, based on its 2-grams. |
 | `ut_levenshtein(w1, w2)` | Returns `ut_levenshtein`, the Levenshtein distance between the two values. |
@@ -57,7 +57,7 @@ For example, to split a URL into its parts:
 | `ut_parse_simple(url)`
 ```
 
-For the full list of fields, more examples, and sample output, see the [documentation](https://splunk-platform-apps.github.io/url_toolbox/). The original product guide is also available as a [PDF](utbox/appserver/static/documentation.pdf).
+For the full list of fields, more examples, and sample output, see the [documentation](https://splunk-platform-apps.github.io/url_toolbox/).
 
 ## Troubleshooting
 
