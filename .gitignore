@@ -81,6 +81,3 @@ build/
 
 # Local packaging output (make package)
 dist/
-
-# Output of make test
-/var/

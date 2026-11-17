@@ -7,4 +7,4 @@ package:
 	COPYFILE_DISABLE=1 tar -C dist -czf dist/utbox.tar.gz utbox
 
 test:
-	SPLUNK_HOME=. python -m unittest discover tests
+	python -m pytest tests
