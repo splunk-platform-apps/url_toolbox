@@ -10,23 +10,21 @@ import ut_log
 ########
 logger = ut_log.setup_logger()
 
-header = ['word', 'set', 'ut_suites']
+header = ["word", "set", "ut_suites"]
 
-csv_in = csv.DictReader(
-    sys.stdin)  # automatically use the first line as header
+csv_in = csv.DictReader(sys.stdin)  # automatically use the first line as header
 csv_out = csv.DictWriter(sys.stdout, header)
 csv_out.writerow(dict(zip(header, header)))  # write header
 
 for row in csv_in:
-
     try:
-        word = row['word'].strip()
-        wordset = row['set'].strip()
+        word = row["word"].strip()
+        wordset = row["set"].strip()
 
         counts = ut_presets.suites(word, wordset)
 
-        #row['ut_suites'] = json.dumps({'ut_suites':counts})
-        row['ut_suites'] = json.dumps(counts)
+        # row['ut_suites'] = json.dumps({'ut_suites':counts})
+        row["ut_suites"] = json.dumps(counts)
 
     except Exception as e:
         logger.info(str(e))

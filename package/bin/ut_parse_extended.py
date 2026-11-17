@@ -10,30 +10,29 @@ import ut_parse_lib
 ########
 try:
     logger = ut_log.setup_logger()
-except:
+except Exception:
     logger = logging.getLogger(__name__)
     logger.warning("Failed to instantiate logger, falling back to default logger")
 
 header = [
-    'url',
-    'list',
-    'ut_scheme',
-    'ut_netloc',
-    'ut_path',
-    'ut_params',
-    'ut_query',
-    'ut_fragment',
-    'ut_domain',
-    'ut_tld',
-    'ut_domain_without_tld',
-    'ut_subdomain',
-    'ut_port',
-    'ut_subdomain_parts',
-    'ut_subdomain_count',
+    "url",
+    "list",
+    "ut_scheme",
+    "ut_netloc",
+    "ut_path",
+    "ut_params",
+    "ut_query",
+    "ut_fragment",
+    "ut_domain",
+    "ut_tld",
+    "ut_domain_without_tld",
+    "ut_subdomain",
+    "ut_port",
+    "ut_subdomain_parts",
+    "ut_subdomain_count",
 ]
 
-csv_in = csv.DictReader(
-    sys.stdin)  # automatically use the first line as header
+csv_in = csv.DictReader(sys.stdin)  # automatically use the first line as header
 csv_out = csv.DictWriter(sys.stdout, header)
 csv_out.writerow(dict(zip(header, header)))  # write header
 
@@ -41,25 +40,25 @@ TLDList = None
 
 for row in csv_in:
     try:
-        url = row['url'].strip()
-    except Exception as e:
+        url = row["url"].strip()
+    except Exception:
         logger.error("Did not find url field in row, continuing with next row")
         continue
 
-    if TLDList == None:
+    if TLDList is None:
         try:
-            l = "pouet"
-            if 'list' in row:
-                l = row['list'].strip().lower()
-            TLDList = ut_parse_lib.loadTLDFile(l)
+            list_name = "pouet"
+            if "list" in row:
+                list_name = row["list"].strip().lower()
+            TLDList = ut_parse_lib.loadTLDFile(list_name)
         except Exception as e:
-            logger.error("Failed to load TLD list with error: %s" % str(e))
+            logger.error(f"Failed to load TLD list with error: {e}")
 
     try:
         res = ut_parse_lib.parse_extended(url, TLDList)
         row.update(res)
     except Exception as e:
-        logger.error("Got error %s on with url %s" % (str(e), url))
+        logger.error(f"Got error {e} on with url {url}")
 
     # return row to Splunk
     csv_out.writerow(row)

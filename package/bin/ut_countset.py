@@ -1,6 +1,9 @@
 import sys
 import csv
 import json
+
+import ut_presets
+
 """
 # a-z
 set_az = set(chr(c) for c in range(0x61, 0x7b))
@@ -63,25 +66,23 @@ def countset(word, wordset):
 	return counts
 
 """
-import ut_presets
 
 ########
 # MAIN #
 ########
-header = ['word', 'set', 'ut_countset']
+header = ["word", "set", "ut_countset"]
 
-csv_in = csv.DictReader(
-    sys.stdin)  # automatically use the first line as header
+csv_in = csv.DictReader(sys.stdin)  # automatically use the first line as header
 csv_out = csv.DictWriter(sys.stdout, header)
 csv_out.writerow(dict(zip(header, header)))  # write header
 
 for row in csv_in:
-    word = row['word'].strip()
-    wordset = row['set'].strip()
+    word = row["word"].strip()
+    wordset = row["set"].strip()
 
     counts = ut_presets.countset(word, wordset)
 
-    row['ut_countset'] = json.dumps({'ut_countset': counts})
+    row["ut_countset"] = json.dumps({"ut_countset": counts})
 
     # return row to Splunk
     csv_out.writerow(row)

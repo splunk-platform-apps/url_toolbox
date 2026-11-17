@@ -1,19 +1,18 @@
 import os
-import re
 import sys
 import csv
 
 
 def ngramsplit(word, length):
     """
-	ngramsplit("google", 2) => {'go':1, 'oo':1, 'og':1, 'gl':1, 'le':1}
-	"""
+    ngramsplit("google", 2) => {'go':1, 'oo':1, 'og':1, 'gl':1, 'le':1}
+    """
     grams = {}
 
     for i in range(0, len(word) - length + 1):
-        g = word[i:i + length]
+        g = word[i : i + length]
 
-        if not g in grams:
+        if g not in grams:
             grams[g] = 0
         grams[g] += 1
     return grams
@@ -25,7 +24,7 @@ def loadFile(f_name, gram_size=2):
     LIST = {}
     entries = 0
 
-    f_in = open(f_path, "r")
+    f_in = open(f_path)
     line = f_in.readline()
     while line:
         line = line.lower().strip()
@@ -33,7 +32,7 @@ def loadFile(f_name, gram_size=2):
         entries += 1
 
         for g in grams:
-            if not g in LIST:
+            if g not in LIST:
                 LIST[g] = 0
 
             LIST[g] += grams[g]
@@ -46,18 +45,16 @@ def loadFile(f_name, gram_size=2):
 
 def bayescore(word, n_good, set_good, n_bad, set_bad, gram_size=2):
     """
-	Compute the naive bayesian score - Probability that the domain is a bad one knowing it's ngrams.
-	Actually limited to 2-grams for now
-	"""
+    Compute the naive bayesian score - Probability that the domain is a bad one knowing it's ngrams.
+    Actually limited to 2-grams for now
+    """
 
-    score = 0.0
     P_Total = 1.0
     P_TotalInv = 1.0
 
     grams = ngramsplit(word, gram_size)
     for g in grams:
-
-        if not g in set_bad or not g in set_good:
+        if g not in set_bad or g not in set_good:
             continue
 
         # probability that the gram X appears in bad domains
@@ -70,9 +67,9 @@ def bayescore(word, n_good, set_good, n_bad, set_bad, gram_size=2):
         P = P_G_B / (P_G_B + P_G_G)
 
         P_Total *= P
-        P_TotalInv *= (1 - P)
+        P_TotalInv *= 1 - P
 
-    return (P_Total / (P_Total + P_TotalInv))
+    return P_Total / (P_Total + P_TotalInv)
 
 
 ########
@@ -81,17 +78,16 @@ def bayescore(word, n_good, set_good, n_bad, set_bad, gram_size=2):
 (n_good, set_good) = loadFile("bayesian_good.dic")
 (n_bad, set_bad) = loadFile("bayesian_bad.dic")
 
-header = ['word', 'ut_bayesian']
+header = ["word", "ut_bayesian"]
 
-csv_in = csv.DictReader(
-    sys.stdin)  # automatically use the first line as header
+csv_in = csv.DictReader(sys.stdin)  # automatically use the first line as header
 csv_out = csv.DictWriter(sys.stdout, header)
 csv_out.writerow(dict(zip(header, header)))  # write header
 
 for row in csv_in:
-    word = row['word'].lower().strip()
+    word = row["word"].lower().strip()
 
-    row['ut_bayesian'] = bayescore(word, n_good, set_good, n_bad, set_bad)
+    row["ut_bayesian"] = bayescore(word, n_good, set_good, n_bad, set_bad)
 
     # return row to Splunk
     csv_out.writerow(row)

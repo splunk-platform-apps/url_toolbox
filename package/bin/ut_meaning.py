@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import csv
+
 """
 Module that compute a ratio between the word length and the length of it's known composing words
 Use the wordlist meaning.dic (one word per line). This list is loaded once per batch of 50,000
@@ -15,10 +16,9 @@ This is a very naive algorithm, this should be improved.
 
 
 def loadWordlist():
-    f_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                          "meaning.dic")
+    f_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "meaning.dic")
 
-    f_in = open(f_path, "r")
+    f_in = open(f_path)
     WORDLIST = {}
 
     line = f_in.readline()
@@ -27,11 +27,11 @@ def loadWordlist():
         le = len(line)
 
         # do we have a words of the same size already?
-        if not le in WORDLIST:
+        if le not in WORDLIST:
             WORDLIST[le] = []
 
         # check required in case of duplicated words.
-        if not line in WORDLIST[le]:
+        if line not in WORDLIST[le]:
             WORDLIST[le].append(re.compile(line))
 
         line = f_in.readline()
@@ -47,11 +47,10 @@ def meaning(WORDLIST, word):
     s_len = 0
 
     for i in range(wlen, 0, -1):
-        if not i in WORDLIST:
+        if i not in WORDLIST:
             continue
 
         for preg_t in WORDLIST[i]:
-
             if preg_t.search(word):
                 word = preg_t.sub(".", word)
                 s_len += i
@@ -67,17 +66,16 @@ def meaning(WORDLIST, word):
 # MAIN #
 ########
 WORDLIST = loadWordlist()
-header = ['word', 'ut_meaning_ratio']
+header = ["word", "ut_meaning_ratio"]
 
-csv_in = csv.DictReader(
-    sys.stdin)  # automatically use the first line as header
+csv_in = csv.DictReader(sys.stdin)  # automatically use the first line as header
 csv_out = csv.DictWriter(sys.stdout, header)
 csv_out.writerow(dict(zip(header, header)))  # write header
 
 for row in csv_in:
-    word = row['word'].strip()
+    word = row["word"].strip()
 
-    row['ut_meaning_ratio'] = meaning(WORDLIST, word)
+    row["ut_meaning_ratio"] = meaning(WORDLIST, word)
 
     # return row to Splunk
     csv_out.writerow(row)
