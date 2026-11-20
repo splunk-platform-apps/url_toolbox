@@ -69,7 +69,7 @@ jobs:
           curl -sk -u "${SPLUNK_USER}:${SPLUNK_PASSWORD}" "${SPLUNK_HOST}/services/server/control/restart" -X POST
           sleep 30
           for i in {1..60}; do
-            code=$(curl -sk -o /dev/null -w "%{http_code}" -u "${SPLUNK_USER}:${SPLUNK_PASSWORD}" "${SPLUNK_HOST}/services/server/info")
+            code=$(curl -sk -o /dev/null -w "%{http_code}" -u "${SPLUNK_USER}:${SPLUNK_PASSWORD}" "${SPLUNK_HOST}/services/server/info" || true)
             if [ "${code}" -eq 200 ]; then
               echo "Splunk is up (attempt ${i})"
               exit 0
