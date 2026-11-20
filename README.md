@@ -1,5 +1,10 @@
 # url_toolbox
 
+URL Toolbox (UTBox) is a set of building blocks for Splunk that are specially created for URL manipulation. UTBox is modular, easy to use, and easy to deploy in any Splunk environment.
+
+> [!NOTE]
+> Discover more about this app in [this blog post](https://www.splunk.com/en_us/blog/security/ut-parsing-domains-like-house-slytherin.html) on Splunk Blogs.
+
 ## Getting Started
 
 To install and run this app, download the latest compiled application directly from the releases page.

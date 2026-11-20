@@ -78,3 +78,6 @@ build/
 # Pre-commit
 .ruff-cache
 .python-version
+
+# Local packaging output (make package)
+dist/
