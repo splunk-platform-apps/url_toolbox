@@ -1,84 +1,27 @@
 # URL Toolbox
 
-URL Toolbox (UTBox) is a set of building blocks for Splunk that are specially created for URL manipulation. It is a search-time app with no user interface. It bundles eight external lookups, each with a macro that makes it easier to use. The lookups declare `python.required = 3.13`.
+URL Toolbox (UTBox) is a set of building blocks for Splunk that are specially created for URL manipulation. It is a search-time app with no user interface.
 
 ## Features
 
 - Parses URLs correctly, including complicated top-level domains (TLDs), using the Mozilla Suffix List.
 - Provides other building blocks, such as Shannon entropy, character counting, suites, meaning ratio, Bayesian analysis, and Levenshtein distance.
-- Ships one macro for each lookup.
-- Needs to be deployed on search heads only. The knowledge bundles are sent to your indexers automatically.
+- Bundles eight external lookups, each with a macro to ease their usage.
 
-## Getting Started
-
-> Building blocks for URL manipulation in Splunk.
-
-### Requirements
-
-- Splunk Enterprise or Splunk Cloud Platform. The lookups declare Python 3.13, so use a Splunk version that provides it. See [Versions Supported](#versions-supported).
-
-### Installation
-
-Install the app on the search tier of your deployment.
-
-- **Splunkbase:** in Splunk Web, go to **Apps > Find More Apps**, search for URL Toolbox, and install it.
-- **Package file:** if you need a specific version, or you want to inspect the package before you install it, download it from the [releases page](https://github.com/splunk-platform-apps/url_toolbox/releases). Then follow the Splunk documentation to [install the app](https://docs.splunk.com/Documentation/AddOns/released/Overview/Installingadd-ons) on your platform.
-
-The app ID is `utbox`. Installing a new version over an existing one keeps your `local` customizations.
-
-### Usage
+### Macros
 
 The app provides one macro for each lookup. The arguments are the fields in your events that hold the value to analyze.
 
-| Macro | Result fields |
-| --- | --- |
-| `ut_parse_simple(url)` | Splits a URL into `ut_scheme`, `ut_netloc`, `ut_path`, `ut_params`, `ut_query`, and `ut_fragment`. |
-| `ut_parse(url, list)` | Parses a URL into its parts and also returns the domain, subdomain, and TLD. It uses the suffix lists. It is a shortcut for `ut_parse_extended(url, list)`. |
-| `ut_shannon(word)` | Returns `ut_shannon`, the Shannon entropy of the value. |
-| `ut_countset(word, set)` | Returns `ut_countset`, the total and per-character counts of the characters in `set`. |
-| `ut_suites(word, set)` | Returns `ut_max_suite_<preset>`, the length of the longest run of consecutive characters for each preset in `set`. |
-| `ut_meaning(word)` | Returns `ut_meaning_ratio`, the ratio between the length of the known words found in the value and the length of the value. |
-| `ut_bayesian(word)` | Returns `ut_bayesian`, a naive Bayesian score of the probability that a domain is malicious, based on its 2-grams. |
-| `ut_levenshtein(w1, w2)` | Returns `ut_levenshtein`, the Levenshtein distance between the two values. |
-
-#### Call a lookup or a macro
-
-A generic lookup call in Splunk has this format:
-
-```
-... | lookup <lookup_name> field AS <field>
-```
-
-For example:
-
-```
-... | lookup ut_parse_simple_lookup url AS cs_uri
-```
-
-UTBox also provides a macro for each lookup. The macro for the previous example is:
-
-```
-... | `ut_parse_simple(cs_uri)`
-```
-
-The macros are shortcuts to the lookup calls. You can use either one.
-
-#### URL syntax
-
-The syntax of a URL is:
-
-```
-scheme://[user:password@]domain:port/path?query_string#fragment_id
-```
-
-- The scheme defines how the resource is obtained. In many cases it is the name of a protocol, but not always. Examples are `http`, `https`, `ftp`, and `file`.
-- The domain name, or a numeric IP address, gives the destination location.
-- The port number is optional. If it is omitted, the default for the scheme is used, such as 80 for `http` and 443 for `https`.
-- The path specifies the resource that is requested.
-- The query string contains data to pass to the software that runs on the server. It can contain name and value pairs that are separated by ampersands, such as `?first_name=John&last_name=Doe`.
-- The fragment identifier, if present, specifies a part or a position within the resource or document.
-
-Source: [Uniform Resource Locator on Wikipedia](https://en.wikipedia.org/wiki/Uniform_resource_locator).
+| Macro | Lookup | Result fields |
+| --- | --- | --- |
+| `ut_parse_simple(url)` | `ut_parse_simple_lookup` | Splits a URL into `ut_scheme`, `ut_netloc`, `ut_path`, `ut_params`, `ut_query`, and `ut_fragment`. |
+| `ut_parse(url, list)` | `ut_parse_extended_lookup` | Parses a URL into its parts and also returns the domain, subdomain, and TLD. It uses the suffix lists. It is a shortcut for `ut_parse_extended(url, list)`. |
+| `ut_shannon(word)` | `ut_shannon_lookup` | Returns `ut_shannon`, the Shannon entropy of the value. |
+| `ut_countset(word, set)` | `ut_countset_lookup` | Returns `ut_countset`, the total and per-character counts of the characters in `set`. |
+| `ut_suites(word, set)` | `ut_suites_lookup` | Returns `ut_max_suite_<preset>`, the length of the longest run of consecutive characters for each preset in `set`. |
+| `ut_meaning(word)` | `ut_meaning_lookup` | Returns `ut_meaning_ratio`, the ratio between the length of the known words found in the value and the length of the value. |
+| `ut_bayesian(word)` | `ut_bayesian_lookup` | Returns `ut_bayesian`, a naive Bayesian score of the probability that a domain is malicious, based on its 2-grams. |
+| `ut_levenshtein(w1, w2)` | `ut_levenshtein_lookup` | Returns `ut_levenshtein`, the Levenshtein distance between the two values. |
 
 #### ut_parse_simple
 
@@ -187,6 +130,45 @@ The `set` argument of `ut_countset` and `ut_suites` accepts these presets. The n
 
 > [!NOTE]
 > The presets that contain digits also contain `: ; < = > ?`, because the digit set spans the ASCII range 0x30 to 0x3F. The presets `@consonants_up@` and `@consonants_all@` do not contain the uppercase consonants. These are known behaviors of the current version and are kept for compatibility.
+
+## Getting Started
+
+### Requirements
+
+- Splunk Enterprise or Splunk Cloud Platform. The lookups declare Python 3.13, so use a Splunk version that provides it. See [Versions Supported](#versions-supported).
+
+### Installation
+
+Install the app on the search tier of your deployment.
+
+- **Splunkbase:** in Splunk Web, go to **Apps > Find More Apps**, search for URL Toolbox, and install it.
+- **Package file:** if you need a specific version, or you want to inspect the package before you install it, download it from the [releases page](https://github.com/splunk-platform-apps/url_toolbox/releases). Then follow the Splunk documentation to [install the app](https://docs.splunk.com/Documentation/AddOns/released/Overview/Installingadd-ons) on your platform.
+
+The app needs to be deployed on search heads only. The knowledge bundles are sent to your indexers automatically.
+
+👉 The app ID is `utbox`. Installing a new version over an existing one keeps your `local` customizations.
+
+### Usage
+
+A generic lookup call in Splunk has this format:
+
+```
+... | lookup <lookup_name> field AS <field>
+```
+
+For example:
+
+```
+... | lookup ut_parse_simple_lookup url AS cs_uri
+```
+
+Or using the macro:
+
+```
+... | `ut_parse_simple(cs_uri)`
+```
+
+👉 The macros are shortcuts to the lookup calls. You can use either one.
 
 ## Troubleshooting
 
@@ -314,6 +296,7 @@ The app 1.9.5 was tested with an in-place upgrade from 1.9.3, and with all looku
 
 - [URL Toolbox on Splunkbase](https://splunkbase.splunk.com/app/2734/)
 - [Parsing domains like House Slytherin (Splunk Blogs)](https://www.splunk.com/en_us/blog/security/ut-parsing-domains-like-house-slytherin.html)
+- [Uniform Resource Locator on Wikipedia](https://en.wikipedia.org/wiki/Uniform_resource_locator)
 
 ## Contributing
 See the [CONTRIBUTING.md](https://github.com/splunk-platform-apps/.github/blob/main/.github/CONTRIBUTING.md) file for details.
